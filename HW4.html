@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<link rel="stylesheet" href="style.css">
+<script id="vertex-shader" type="x-shader/x-vertex">
+precision mediump float;
+
+attribute vec4 vPosition;
+attribute vec4 vColor;
+attribute vec4 vNormal;
+attribute vec2 vTexCoord;
+
+varying vec4 fPosition;
+varying vec4 fColor;
+varying vec2 fTexCoord;
+varying vec4 fNormal;
+
+uniform mat4 modelingMatrix;
+uniform mat4 viewingMatrix;
+uniform mat4 projectionMatrix;
+
+void main()
+{
+    vec4 N = normalize( modelingMatrix * vNormal );	// Normal vector
+
+	fPosition = modelingMatrix * vPosition;
+    fColor = vColor;
+	fNormal = N;
+	fTexCoord = vTexCoord;
+    gl_Position = projectionMatrix * viewingMatrix * modelingMatrix * vPosition;
+}
+</script>
+
+<script id="fragment-shader" type="x-shader/x-fragment">
+precision mediump float;
+
+varying vec4 fPosition;
+varying vec4 fColor;  // Note that this will be interpolated between vertices.
+varying vec4 fNormal;
+
+uniform mat4 modelingMatrix;
+uniform mat4 viewingMatrix;
+uniform mat4 projectionMatrix;
+uniform vec4 eyePosition;
+uniform vec4 lightPosition;
+uniform vec4 materialAmbient;
+uniform vec4 materialDiffuse;
+uniform vec4 materialSpecular;
+uniform float shininess;
+
+varying vec2 fTexCoord;
+
+uniform sampler2D texture;
+
+void main()
+{
+    vec4 L = normalize( lightPosition - fPosition ); // Light vector
+    vec4 N = fNormal;	// Normal vector
+	vec4 V = normalize( eyePosition - fPosition );		// Eye vector.
+    vec4 H = normalize( L + V );  // Halfway vector in the modified Phong model
+
+	N.w = 0.0;
+	N = normalize(N);
+	
+    // Compute terms in the illumination equation
+    vec4 ambient = materialAmbient;
+
+    float Kd = max( dot(L, N), 0.0 );
+    vec4  diffuse = Kd * materialDiffuse;
+
+	float Ks = pow( max(dot(N, H), 0.0), shininess );
+    vec4  specular = Ks * materialSpecular;
+
+	// Ignoring fColor for objects that have no color attributes
+    gl_FragColor = (ambient + diffuse)*texture2D( texture, fTexCoord ) + specular;
+}
+</script>
+
+<script type="text/javascript" src="Common/webgl-utils.js"></script>
+<script type="text/javascript" src="Common/initShaders.js"></script>
+<script type="text/javascript" src="Common/MV.js"></script>
+<script type="text/javascript" src="basic-objects-IFS.js"></script>
+<script type="text/javascript" src="HW4.js"></script>
+<script type="text/javascript" src="fullscreen.js"></script>
+</head>
+
+<body>
+<canvas id="gl-canvas" width="1920" height="1080">
+Oops ... your browser doesn't support the HTML5 canvas element
+</canvas>
+
+<br/>
+<button id="xButton">Rotate X</button>
+<button id="yButton">Rotate Y</button>
+<button id="zButton">Rotate Z</button>
+<br/>
+<button id="pButton" style="background-color:#00ff00">Pause</button>
+<button id="dButton" style="background-color:#6688cc">Depth Test</button>
+<br/>
+<button id="fullscreen-button">Fullscreen</button>
+按住左鍵向 上/下 拖曳來 增加/減少  shininess
+
+</body>
+</html>
