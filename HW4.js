@@ -238,7 +238,7 @@ function render() {
 	
 	viewing = lookAt(vec3(eyePosition), [0,0,0], [0,1,0]);
 
-	projection = perspective(60, canvas.width/canvas.height, 1.0, 10.0);
+	projection = perspective(60, canvas.width/canvas.height, 0.1, 1000.0);  /// (FOV, proportion, nearest(smaller is better),farest(larger is better))
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 
