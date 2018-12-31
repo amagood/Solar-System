@@ -27,6 +27,24 @@ function handleMouseUp(event) {
     mouseDown = false;
 }
 
+
+
+
+var mouseMove = [0, 0];
+function handleCanvasMouseMove(event) {
+  if (!document.pointerLockElement)
+    return;
+
+  mouseMove[0] += event.movementX;
+  mouseMove[1] += event.movementY;
+}
+
+
+
+
+
+//from teacher
+/*
 function handleMouseMove(event) {
    if (!mouseDown) {
       return;
@@ -50,6 +68,7 @@ function handleMouseMove(event) {
     lastMouseX = newX
     lastMouseY = newY;
 }
+*/
 
 // event handlers for button clicks
 function rotateX() {
@@ -96,7 +115,9 @@ var texCoord = [
 var modelingLoc, viewingLoc, projectionLoc,shininessLoc;
 var modeling, viewing, projection;
 
-var eyePosition   = vec4( 0.0, 0.0, 2.0, 1.0 );
+var eyePosition   = vec4( 0.0, 1.0, 2.0, 1.0 );
+var lookPos=[0,0,0];
+var upPos=[0,1,0];
 var lightPosition = vec4( 10.0, 10.0, 20.0, 1.0 );
 
 var materialAmbient = vec4( 0.25, 0.25, 0.25, 1.0 );
@@ -105,7 +126,7 @@ var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
 var materialShininess = 30.0;
 
 
-function configureTexture( image ) {
+function configureTexture( image , program) {
     texture = gl.createTexture();
     gl.bindTexture( gl.TEXTURE_2D, texture );
     gl.pixelStorei(gl.UNPACK_FLIP_Y_WEBGL, true);
@@ -119,6 +140,24 @@ function configureTexture( image ) {
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
 }
 
+//event trigger
+function eventListenerRegister() {
+  // event listeners for buttons 
+  //document.getElementById('pause-button').addEventListener('click', handlePause);
+  document.getElementById('fullscreen-button').addEventListener('click', handleFullscreen);
+  gl.canvas.addEventListener('mousemove', handleCanvasMouseMove);
+  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('keyup', handleKeyUp);
+  document.addEventListener('fullscreenchange', handleFullScreenChange);
+  document.addEventListener('mozfullscreenchange', handleFullScreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+  document.addEventListener('msfullscreenchange', handleFullScreenChange);
+  window.addEventListener('resize', handleWindowResize);
+}
+
+
+
+
 //var testObject = new cube();
 //var testObject = new ring();
 //var testObject = new uvSphere();
@@ -127,7 +166,7 @@ function configureTexture( image ) {
 //var testObject = new uvCone();
 var testObject = teapotModel; unitize(testObject.vertexPositions); // Make teapot unit sized
 
-window.onload = function init()
+ function init()
 {
     var canvas = document.getElementById( "gl-canvas" );
     
@@ -192,7 +231,7 @@ window.onload = function init()
 	
 	var image = new Image();
     image.onload = function() { 
-        configureTexture( image );
+        configureTexture( image,program );
     }
     image.src = "rimuruSTUNUM.gif";
     
@@ -224,19 +263,97 @@ window.onload = function init()
 	// event handlers for mouse input (borrowed from "Learning WebGL" lesson 11)
 	canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
-    document.onmousemove = handleMouseMove;
+    //document.onmousemove = handleMouseMove;
 	eventListenerRegister()
     render(canvas);
 };
 
+// onload function
+(function() { window.addEventListener('load', init) })();
+
 function render() {
 	var canvas = gl.canvas;
+	
 	modeling = mult(rotate(theta[xAxis], 1, 0, 0),
 	                mult(rotate(theta[yAxis], 0, 1, 0),rotate(theta[zAxis], 0, 0, 1)));
-
-	//if (paused)	modeling = moonRotationMatrix;
 	
-	viewing = lookAt(vec3(eyePosition), [0,0,0], [0,1,0]);
+	//吳尚齊教我的WWWW    轉滑鼠視角XD
+	let step = 6;
+
+    if (keyboardState['ArrowUp'])
+      mouseMove[1] -= step;
+    if (keyboardState['ArrowDown'])
+      mouseMove[1] += step;
+    if (keyboardState['ArrowLeft'])
+      mouseMove[0] -= step;
+    if (keyboardState['ArrowRight'])
+      mouseMove[0] += step;
+	
+	var direction = [];
+	for(var i=0;i<3;i++)
+		direction[i]=lookPos[i]-eyePosition[i];
+	direction=normalize(direction);
+	
+	
+	if (-direction[1] * Math.sign(mouseMove[1]) > 0.8)
+      mouseMove[1] = 0;
+  
+			
+	var rotateMatrix = mult(rotate(mouseMove[0] / 4, [0, -1, 0]),
+                    rotate(mouseMove[1] / 4, [direction[2], 0, -direction[0]]));
+		
+	
+	mouseMove[0] = 0;
+    mouseMove[1] = 0;
+	
+	var newDirection = [0, 0, 0];
+	for (let i = 0; i < 3; ++i)
+		for (let j = 0; j < 3; ++j)
+			newDirection[i] += rotateMatrix[i][j] * direction[j];
+	newDirection = normalize(newDirection);
+	
+	
+    var moveDirection = [0, 0, 0];
+	if (keyboardState['KeyW']) {
+      moveDirection[0] += newDirection[0];
+      moveDirection[2] += newDirection[2];
+      //moveDirection[1] += newDirection[1];
+    }
+
+    if (keyboardState['KeyS']) {
+      moveDirection[0] -= newDirection[0];
+      moveDirection[2] -= newDirection[2];
+      //moveDirection[1] -= newDirection[1];
+    }
+
+    if (keyboardState['KeyA']) {
+      moveDirection[0] += newDirection[2];
+      moveDirection[2] -= newDirection[0];
+    }
+
+    if (keyboardState['KeyD']) {
+      moveDirection[0] -= newDirection[2];
+      moveDirection[2] += newDirection[0];
+    }
+	
+	var newPosition = eyePosition.slice();
+    var newLookAt = [];
+	for (var i = 0; i < 3; ++i) {
+      newPosition[i] += 0.05 * moveDirection[i];
+      newLookAt[i] = newPosition[i] + newDirection[i];
+    }
+	
+	eyePosition=newPosition.slice();
+	lookPos=newLookAt.slice();
+	//console.log('newPos' + newPosition);
+	//console.log('newDir' + newDirection);
+	
+	//if (paused)	modeling = moonRotationMatrix;
+	//console.log(eyePosition +'     ' + lookPos +'     ' + upPos);
+	//console.log(lookPos);
+	//console.log(upPos);	
+	
+	viewing = lookAt(vec3(eyePosition), lookPos, upPos);//eyePosition  lookPos upPos
 
 	projection = perspective(60, canvas.width/canvas.height, 0.1, 1000.0);  /// (FOV, proportion, nearest(smaller is better),farest(larger is better))
 
