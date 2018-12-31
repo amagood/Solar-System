@@ -45,14 +45,16 @@ function handleMouseUp(event) {
 
 
 
-var mouseSensitiveX=2.0;
-var mouseSensitiveY=2.0;
+var mouseSensitiveXEle;
+var mouseSensitiveYEle;
+
+
 var mouseMove = [0, 0];
 function handleCanvasMouseMove(event) {
-  
+  //console.log(mouseSensitiveXEle.value);
   //console.log('process');
-  mouseMove[0] += event.movementX/mouseSensitiveX;
-  mouseMove[1] += event.movementY/mouseSensitiveY;
+  mouseMove[0] += event.movementX/(10-mouseSensitiveXEle.value);
+  mouseMove[1] += event.movementY/(10-mouseSensitiveYEle.value);
 }
 
 
@@ -262,7 +264,8 @@ var testObject = teapotModel; unitize(testObject.vertexPositions); // Make teapo
     document.getElementById( "zButton" ).onclick = rotateZ;
     document.getElementById( "pButton" ).onclick = function() {paused=!paused;};
     document.getElementById( "dButton" ).onclick = function() {depthTest=!depthTest;};
-	
+	mouseSensitiveXEle=document.getElementById("x_sensitivity");
+	mouseSensitiveYEle=document.getElementById("y_sensitivity");
 	// event handlers for mouse input (borrowed from "Learning WebGL" lesson 11)
 	canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
@@ -276,7 +279,6 @@ var testObject = teapotModel; unitize(testObject.vertexPositions); // Make teapo
 
 function render() {
 	var canvas = gl.canvas;
-	
 	modeling = mult(rotate(theta[xAxis], 1, 0, 0),
 	                mult(rotate(theta[yAxis], 0, 1, 0),rotate(theta[zAxis], 0, 0, 1)));
 	
