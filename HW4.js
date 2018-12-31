@@ -15,7 +15,23 @@ var mouseDown = false;
 var lastMouseX = null;
 var lastMouseY = null;
 
-var moonRotationMatrix = mat4();
+//event trigger
+function eventListenerRegister() {
+  // event listeners for buttons 
+  //document.getElementById('pause-button').addEventListener('click', handlePause);
+  document.getElementById('fullscreen-button').addEventListener('click', handleFullscreen);
+  gl.canvas.addEventListener('mousemove', handleCanvasMouseMove);
+  document.addEventListener('keydown', handleKeyDown);
+  document.addEventListener('keyup', handleKeyUp);
+  document.addEventListener('fullscreenchange', handleFullScreenChange);
+  document.addEventListener('mozfullscreenchange', handleFullScreenChange);
+  document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
+  document.addEventListener('msfullscreenchange', handleFullScreenChange);
+  window.addEventListener('resize', handleWindowResize);
+}
+
+
+
 
 function handleMouseDown(event) {
     mouseDown = true;
@@ -29,14 +45,14 @@ function handleMouseUp(event) {
 
 
 
-
+var mouseSensitiveX=2.0;
+var mouseSensitiveY=2.0;
 var mouseMove = [0, 0];
 function handleCanvasMouseMove(event) {
-  if (!document.pointerLockElement)
-    return;
-
-  mouseMove[0] += event.movementX;
-  mouseMove[1] += event.movementY;
+  
+  //console.log('process');
+  mouseMove[0] += event.movementX/mouseSensitiveX;
+  mouseMove[1] += event.movementY/mouseSensitiveY;
 }
 
 
@@ -140,20 +156,7 @@ function configureTexture( image , program) {
     gl.uniform1i(gl.getUniformLocation(program, "texture"), 0);
 }
 
-//event trigger
-function eventListenerRegister() {
-  // event listeners for buttons 
-  //document.getElementById('pause-button').addEventListener('click', handlePause);
-  document.getElementById('fullscreen-button').addEventListener('click', handleFullscreen);
-  gl.canvas.addEventListener('mousemove', handleCanvasMouseMove);
-  document.addEventListener('keydown', handleKeyDown);
-  document.addEventListener('keyup', handleKeyUp);
-  document.addEventListener('fullscreenchange', handleFullScreenChange);
-  document.addEventListener('mozfullscreenchange', handleFullScreenChange);
-  document.addEventListener('webkitfullscreenchange', handleFullScreenChange);
-  document.addEventListener('msfullscreenchange', handleFullScreenChange);
-  window.addEventListener('resize', handleWindowResize);
-}
+
 
 
 
@@ -278,7 +281,7 @@ function render() {
 	                mult(rotate(theta[yAxis], 0, 1, 0),rotate(theta[zAxis], 0, 0, 1)));
 	
 	//吳尚齊教我的WWWW    轉滑鼠視角XD
-	let step = 6;
+	let step = 1;
 
     if (keyboardState['ArrowUp'])
       mouseMove[1] -= step;

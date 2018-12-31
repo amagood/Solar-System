@@ -60,12 +60,6 @@ function handleKeyDown(event) {
   case 'f':
     handleFullscreen();
     break;
-  case 'p':
-    if (document.pointerLockElement)
-      document.exitPointerLock();
-    else
-      gl.canvas.requestPointerLock();
-    break;
   }
 }
 
