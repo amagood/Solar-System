@@ -186,7 +186,7 @@ var testObject = teapotModel; unitize(testObject.vertexPositions); // Make teapo
     
     //  Load shaders and initialize attribute buffers
     
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    var program = initShaders( gl, "./shaders/vShader.glsl", "./shaders/fShaders.glsl" );
     gl.useProgram( program );
     
     // vertex array attribute buffer
