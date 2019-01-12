@@ -14,6 +14,11 @@ uniform mat4 modelingMatrix;
 uniform mat4 viewingMatrix;
 uniform mat4 projectionMatrix;
 
+
+
+//uniform float rt_w; // GeeXLab built-in
+//uniform float rt_h; // GeeXLab built-in
+
 void main()
 {
     vec4 N = normalize( modelingMatrix * vNormal );	// Normal vector

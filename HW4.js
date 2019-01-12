@@ -364,7 +364,7 @@ function render() {
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 
-    if (! paused) theta[axis] += 2.0;
+    if (! paused) theta[axis] += 0.0;
 	if (depthTest) gl.enable(gl.DEPTH_TEST); else gl.disable(gl.DEPTH_TEST);
 
     gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling) );
