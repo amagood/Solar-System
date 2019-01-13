@@ -18,6 +18,7 @@
  * which is s model of the OpenGL teapot in the same format.
  */
 
+//圖學專題註解：這裡計算的座標->>＊＊y座標為高度＊＊
  
  /**
   * Create a model of a cube, centered at the origin.  (This is not
@@ -153,10 +154,113 @@ function ring(innerRadius, outerRadius, slices) {
  *    is the number of vertical slices, bounded by lines of latitude, the
  *    north pole and the south pole.)
  */
-function uvSphere(radius, slices, stacks) {
+function obj_sphere(radius, pos_x, pos_y, pos_z ,degree)
+{
+  
+  this.numVertices = 0;
+  this.pointsArray = [];
+  this.colorsArray = [];
+  this.normalsArray = [];
+  this.texcoords = [];
+
+  let tex_index = 0;//test_for_texcord
+  this.spherePoint = function (theta, phi) {
+    var V = vec4(radius*Math.cos(theta)*Math.cos(phi)+pos_x/radius, radius*Math.sin(phi)+pos_y/radius, radius*Math.sin(theta)*Math.cos(phi)+pos_z/radius, 1.0);//計算座標
+    //var V = vec4(Math.cos(theta)*Math.cos(phi)+pos_x/radius, 0, Math.sin(theta)*Math.cos(phi)+pos_z/radius, 1.0);
+    var smallV = scalev(radius, V); // scale the sphere to the range of [-0.5, 0.5]
+
+    
+    this.pointsArray.push(smallV);
+    V[3]=0.0; // convert point to vector
+    normalize(V, 1);
+    this.normalsArray.push(V);
+    this.colorsArray.push(vec4(1.0, 0.0, 0.0, 1.0));
+    this.texcoords.push(0+theta/Math.PI/2.0);//test_for_texcord
+    this.texcoords.push(0+phi/Math.PI+0.5);//test_for_texcord
+  }
+
+  var step = degree;//模組細節度->>推測
+  var rP1, rP2, rT1, rT2;
+  var phi, theta, lastPhi=-90, lastTheta=0;
+    
+  for (phi=-90+step; phi<=90; phi+=step) {
+    rP1 = lastPhi / 180.0 * Math.PI;
+    rP2 = phi / 180.0 * Math.PI;
+
+    for (theta=step; theta<=360+step; theta+=step) {
+      rT1 = lastTheta / 180.0 * Math.PI;
+      rT2 = theta / 180.0 * Math.PI;
+      
+      // first triangle, may be skipped for the south pole
+      if (lastPhi != -90) {
+        this.spherePoint(rT1, rP1);
+        this.spherePoint(rT2, rP1);
+        this.spherePoint(rT1, rP2);
+        this.numVertices += 3;
+      }
+      
+      // second triangle, may be skipped for the north pole
+      if (phi != 90) {
+        this.spherePoint(rT2, rP2);
+        this.spherePoint(rT1, rP2);
+        this.spherePoint(rT2, rP1);
+        this.numVertices += 3;
+      }
+      lastTheta = theta;
+    }     
+    lastPhi = phi;    
+  }
+}
+
+
+
+function obj_ring(inner_radius,outer_radius, pos_x, pos_y, pos_z,degree)
+{
+  this.numVertices = 0;
+  this.pointsArray = [];
+  this.colorsArray = [];
+  this.normalsArray = [];
+  this.texcoords = [];
+  this.spherePoint = function (theta, radius) {
+    var V = vec4(radius*Math.cos(theta)+pos_x/radius, 0+pos_y/radius, radius*Math.sin(theta)+pos_z/radius, 1.0);//計算座標
+    var smallV = scalev(radius, V); // scale the sphere to the range of [-0.5, 0.5]
+    
+    this.pointsArray.push(smallV);
+    V[3]=0.0; // convert point to vector
+    normalize(V, 1);
+    this.normalsArray.push(V);
+    this.colorsArray.push(vec4(1.0, 0.0, 0.0, 1.0));
+  }
+
+  var step = degree;//模組細節度->>推測 改得越低->>越圓
+  var rP1, rP2, rT1, rT2;
+  var phi, theta, lastPhi=-90, lastTheta=0;
+    
+  for (theta=step; theta<=360; theta+=step) {
+    rT1 = lastTheta / 180.0 * Math.PI;
+    rT2 = theta / 180.0 * Math.PI;
+      
+    this.spherePoint(rT1, inner_radius);
+    this.spherePoint(rT2, outer_radius);
+    this.spherePoint(rT1, outer_radius);
+    this.numVertices += 3;
+      
+    this.spherePoint(rT2, outer_radius);
+    this.spherePoint(rT1, inner_radius);
+    this.spherePoint(rT2, inner_radius);
+    this.numVertices += 3;
+    lastTheta = theta;
+  }     
+}
+
+
+function uvSphere(radius, slices, stacks, pos_x, pos_y, pos_z) {
    radius = radius || 0.5;
    slices = slices || 32;
    stacks = stacks || 16;
+   pos_x = pos_x||0;
+   pos_y = pos_y||0;
+   pos_z = pos_z||0;
    var vertexCount = (slices+1)*(stacks+1);
    var vertices = new Float32Array( 3*vertexCount );
    var normals = new Float32Array( 3* vertexCount );
@@ -174,11 +278,11 @@ function uvSphere(radius, slices, stacks) {
          x = Math.cos(u)*Math.cos(v);
          y = Math.sin(u)*Math.cos(v);
          z = Math.sin(v);
-         vertices[indexV] = radius*x;
+         vertices[indexV] = radius*x+pos_x;
          normals[indexV++] = x;
-         vertices[indexV] = radius*y;
+         vertices[indexV] = radius*y+pos_y;
          normals[indexV++] = y;
-         vertices[indexV] = radius*z;
+         vertices[indexV] = radius*z+pos_z;
          normals[indexV++] = z;
          texCoords[indexT++] = j/slices;
          texCoords[indexT++] = i/stacks;
