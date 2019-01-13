@@ -165,7 +165,7 @@ function configureTexture( image , program) {
 
 
 
-var draw_time = 10;
+var draw_time = 1;
 
 var sun = new obj_sphere(0.2,0,0,0,draw_time);
 var mec = new obj_sphere(0.1,0.05,0,0,draw_time);
@@ -202,7 +202,7 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
         sun_sphere.TEXture( sun_image );
     }
     sun_sphere.the_buffer(sun,program);
-    sun_image.src = "8k_sun.jpg";
+    sun_image.src = "8k_sun.png";
     all_obj.push(sun_sphere);
 
     let mec_sphere = new obj_buffer_tex(program);
@@ -274,7 +274,7 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
         net_sphere.TEXture( net_image );
     }
     net_sphere.the_buffer(net,program);
-    net_image.src = "8k_sun.jpg";
+    net_image.src = "8k_sun.png";
     all_obj.push(net_sphere);
 
     let bor_sphere = new obj_buffer_tex(program);
@@ -433,10 +433,10 @@ function render(program) {
         gl.uniformMatrix4fv( projectionLoc, 0, flatten(projection) );
 	
 		
-		/*
-		if(i==obj_count-1)
+		
+		if(i==0)
 		{
-			gl.disable(gl.DEPTH_TEST);
+			//gl.disable(gl.DEPTH_TEST);
 			gl.enable(gl.BLEND);
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
 			gl.blendEquation(gl.FUNC_SUBSTRACT);
@@ -445,7 +445,8 @@ function render(program) {
 		{
 			gl.disable(gl.BLEND);
 			gl.enable(gl.DEPTH_TEST);
-		}*/
+			gl.depthMask(true);
+		}
 		
         all_obj[i].the_attribute(program);
 		

@@ -95,8 +95,9 @@ void main()
 
     // *** Lab Exercise 2: You will need to change the next line too.
     //gl_FragColor = (ambient + diffuse) * texture2D( texture, fTexCoord );
-    gl_FragColor = (ambient + diffuse + specular)*texture2D( texture, fTexCoord );// * fColor;
+    gl_FragColor =vec4((ambient + diffuse + specular)*texture2D( texture, fTexCoord )) ;// * fColor;
+	gl_FragColor.a*=fColor.a;
     //gl_FragColor = texture2D( texture, fTexCoord );// * fColor;
     //gl_FragColor = (ambient + diffuse + specular) * fColor;
-	gl_FragColor*=applyFXAA(fTexCoord, texture);
+	//gl_FragColor*=applyFXAA(fTexCoord, texture);
 }
