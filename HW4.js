@@ -4,10 +4,15 @@ var xAxis = 0;
 var yAxis = 1;
 var zAxis = 2;
 
-var axis = 0;
+var axis = 1;
 var theta = [ 0, 0, 0 ];
 var paused = 0;
 var depthTest = 1;
+
+var obj_count = 10;
+
+var all_obj = [];
+var obj_tex = [];
 
 var width,height;
 // event handlers for mouse input (borrowed from "Learning WebGL" lesson 11)
@@ -141,7 +146,7 @@ var lightPosition = vec4( 10.0, 10.0, 20.0, 1.0 );
 var materialAmbient = vec4( 0.25, 0.25, 0.25, 1.0 );
 var materialDiffuse = vec4( 0.8, 0.8, 0.7, 1.0);
 var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
-var materialShininess = 30.0;
+var materialShininess = 100.0;
 
 
 function configureTexture( image , program) {
@@ -160,16 +165,18 @@ function configureTexture( image , program) {
 
 
 
+var draw_time = 10;
 
-
-
-//var testObject = new cube();
-//var testObject = new ring();
-//var testObject = new uvSphere();
-//var testObject = new uvTorus();
-//var testObject = new uvCylinder();
-//var testObject = new uvCone();
-var testObject = teapotModel; unitize(testObject.vertexPositions); // Make teapot unit sized
+var sun = new obj_sphere(0.2,0,0,0,draw_time);
+var mec = new obj_sphere(0.1,0.05,0,0,draw_time);
+var ven = new obj_sphere(0.1,0.1,0,0,draw_time);
+var ear = new obj_sphere(0.1,0.15,0,0,draw_time);
+var mar = new obj_sphere(0.1,0.2,0,0,draw_time);
+var jub = new obj_sphere(0.1,0.25,0,0,draw_time);
+var sat = new obj_sphere(0.1,0.3,0,0,draw_time);
+var ura = new obj_sphere(0.1,0.35,0,0,draw_time);
+var net = new obj_sphere(0.1,0.4,0,0,draw_time);
+var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
 
  function init()
 {
@@ -182,63 +189,105 @@ var testObject = teapotModel; unitize(testObject.vertexPositions); // Make teapo
     //  Configure WebGL
     //
     gl.viewport( 0, 0, canvas.width, canvas.height );
-    gl.clearColor( 1.0, 1.0, 1.0, 1.0 );
+    gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
     
     //  Load shaders and initialize attribute buffers
     
-    var program = initShaders( gl, "vertex-shader", "fragment-shader" );
+    var program = initShaders( gl, "./shaders/vShader.glsl", "./shaders/fShaders.glsl" );
     gl.useProgram( program );
-    
-    // vertex array attribute buffer
-    	
-    var vBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, vBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(testObject.vertexPositions), gl.STATIC_DRAW );
 
-    var vPosition = gl.getAttribLocation( program, "vPosition" );
-    gl.vertexAttribPointer( vPosition, 3, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vPosition );
-
-    // color array atrribute buffer	
-    
-    var cBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, cBuffer );
-	// Using the normal vectors as colors because the objects don't have colors assigned. 
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(testObject.vertexNormals), gl.STATIC_DRAW ); 
-
-    var vColor = gl.getAttribLocation( program, "vColor" );
-    gl.vertexAttribPointer( vColor, 3, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vColor );
-
-    // normal array atrribute buffer
-
-    var nBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, nBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(testObject.vertexNormals), gl.STATIC_DRAW );
-    
-    var vNormal = gl.getAttribLocation( program, "vNormal" );
-    gl.vertexAttribPointer( vNormal, 3, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vNormal );
-	
-    // index buffer
-
-	var iBuffer = gl.createBuffer();
-    gl.bindBuffer(gl.ELEMENT_ARRAY_BUFFER, iBuffer);
-    gl.bufferData(gl.ELEMENT_ARRAY_BUFFER, testObject.indices, gl.STATIC_DRAW);
-	
-	var tBuffer = gl.createBuffer();
-    gl.bindBuffer( gl.ARRAY_BUFFER, tBuffer );
-    gl.bufferData( gl.ARRAY_BUFFER, flatten(testObject.vertexTextureCoords), gl.STATIC_DRAW );
-	
-	var vTexCoord = gl.getAttribLocation( program, "vTexCoord" );
-    gl.vertexAttribPointer( vTexCoord, 2, gl.FLOAT, false, 0, 0 );
-    gl.enableVertexAttribArray( vTexCoord );
-	
-	var image = new Image();
-    image.onload = function() { 
-        configureTexture( image,program );
+    let sun_sphere = new obj_buffer_tex(program);
+    var sun_image = new Image();
+    sun_image.onload = function() { 
+        sun_sphere.TEXture( sun_image );
     }
-    image.src = "rimuruSTUNUM.gif";
+    sun_sphere.the_buffer(sun,program);
+    sun_image.src = "8k_sun.jpg";
+    all_obj.push(sun_sphere);
+
+    let mec_sphere = new obj_buffer_tex(program);
+    var mec_image = new Image();
+    mec_image.onload = function() { 
+        mec_sphere.TEXture( mec_image );
+    }
+    mec_sphere.the_buffer(mec,program);
+    mec_image.src = "mec.jpg";
+    all_obj.push(mec_sphere);
+
+    let ven_sphere = new obj_buffer_tex(program);
+    var ven_image = new Image();
+    ven_image.onload = function() { 
+        ven_sphere.TEXture( ven_image );
+    }
+    ven_sphere.the_buffer(ven,program);
+    ven_image.src = "ve.jpg";
+    all_obj.push(ven_sphere);
+
+    let ear_sphere = new obj_buffer_tex(program);
+    var ear_image = new Image();
+    ear_image.onload = function() { 
+        ear_sphere.TEXture( ear_image );
+    }
+    ear_sphere.the_buffer(ear,program);
+    ear_image.src = "moon.jpg";
+    all_obj.push(ear_sphere);
+
+    let mar_sphere = new obj_buffer_tex(program);
+    var mar_image = new Image();
+    mar_image.onload = function() { 
+        mar_sphere.TEXture( mar_image );
+    }
+    mar_sphere.the_buffer(mar,program);
+    mar_image.src = "mars.jpg";
+    all_obj.push(mar_sphere);
+
+    let jub_sphere = new obj_buffer_tex(program);
+    var jub_image = new Image();
+    jub_image.onload = function() { 
+        jub_sphere.TEXture( jub_image );
+    }
+    jub_sphere.the_buffer(jub,program);
+    jub_image.src = "ju.jpg";
+    all_obj.push(jub_sphere);
+
+    let sat_sphere = new obj_buffer_tex(program);
+    var sat_image = new Image();
+    sat_image.onload = function() { 
+        sat_sphere.TEXture( sat_image );
+    }
+    sat_sphere.the_buffer(sat,program);
+    sat_image.src = "sa.jpg";
+    all_obj.push(sat_sphere);
+
+    let ura_sphere = new obj_buffer_tex(program);
+    var ura_image = new Image();
+    ura_image.onload = function() { 
+        ura_sphere.TEXture( ura_image );
+    }
+    ura_sphere.the_buffer(ura,program);
+    ura_image.src = "moon.jpg";
+    all_obj.push(ura_sphere);
+
+    let net_sphere = new obj_buffer_tex(program);
+    var net_image = new Image();
+    net_image.onload = function() { 
+        net_sphere.TEXture( net_image );
+    }
+    net_sphere.the_buffer(net,program);
+    net_image.src = "moon.jpg";
+    all_obj.push(net_sphere);
+
+    let bor_sphere = new obj_buffer_tex(program);
+    var bor_image = new Image();
+    bor_image.onload = function() { 
+        bor_sphere.TEXture( bor_image );
+    }
+    bor_sphere.the_buffer(bor,program);
+    bor_image.src = "moon.jpg";
+    all_obj.push(bor_sphere);
+
+    
+    	
     
 
 	// uniform variables in shaders
@@ -271,13 +320,13 @@ var testObject = teapotModel; unitize(testObject.vertexPositions); // Make teapo
     document.onmouseup = handleMouseUp;
     //document.onmousemove = handleMouseMove;
 	eventListenerRegister()
-    render(canvas);
+    render(canvas,program);
 };
 
 // onload function
 (function() { window.addEventListener('load', init) })();
 
-function render() {
+function render(program) {
 	var canvas = gl.canvas;
 	modeling = mult(rotate(theta[xAxis], 1, 0, 0),
 	                mult(rotate(theta[yAxis], 0, 1, 0),rotate(theta[zAxis], 0, 0, 1)));
@@ -340,6 +389,14 @@ function render() {
       moveDirection[0] -= newDirection[2];
       moveDirection[2] += newDirection[0];
     }
+	if (keyboardState['Space']) {
+      moveDirection[1] -= newDirection[1];
+      
+    }
+	if (keyboardState['ShiftLeft']) {
+      moveDirection[1] += newDirection[1];
+      
+    }
 	
 	var newPosition = eyePosition.slice();
     var newLookAt = [];
@@ -364,15 +421,24 @@ function render() {
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 
-    if (! paused) theta[axis] += 2.0;
+    if (! paused) theta[axis] += 0.2;
 	if (depthTest) gl.enable(gl.DEPTH_TEST); else gl.disable(gl.DEPTH_TEST);
 
-    gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling) );
-    gl.uniformMatrix4fv( viewingLoc,    0, flatten(viewing) );
-	gl.uniformMatrix4fv( projectionLoc, 0, flatten(projection) );
-  
-	gl.uniform1f(shininessLoc,materialShininess);
-    gl.drawElements( gl.TRIANGLES, testObject.indices.length, gl.UNSIGNED_SHORT, 0 );
+    for(let i = 0;i < obj_count;i++)
+    {
+        //let render_obj = all_obj[i];
+        gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling) );
+        gl.uniformMatrix4fv( viewingLoc,    0, flatten(viewing) );
+        gl.uniformMatrix4fv( projectionLoc, 0, flatten(projection) );
+        all_obj[i].the_attribute(program);
+        gl.drawArrays( gl.TRIANGLES, 0, sun.numVertices );
+
+        
+        //gl.drawArrays( gl.TRIANGLES, 129600, ball.numVertices-259200 );
+        //gl.drawArrays( gl.LINE_LOOP, ball.numVertices-129600, 129600 );
+        //gl.drawArrays( gl.LINE_LOOP, 0, sun.numVertices);
+        //gl.drawArrays( gl.TRIANGLES, 0, ball.numVertices);
+    }
 
     requestAnimFrame( render );
 }
