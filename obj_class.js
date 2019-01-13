@@ -86,6 +86,7 @@ class obj_buffer_tex
     gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.normalsArray), gl.STATIC_DRAW);
 
     //
+
     
     this.VertexTextureCoordinate_Buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VertexTextureCoordinate_Buffer);

@@ -1,9 +1,12 @@
 precision mediump float;
 
-
+// Note that the following are interpolated between vertices.
 varying vec4 fPosition;
-varying vec4 fColor;  // Note that this will be interpolated between vertices.
+varying vec4 fColor;  
 varying vec4 fNormal;
+varying vec2 fTexCoord;
+
+uniform sampler2D texture;
 
 uniform mat4 modelingMatrix;
 uniform mat4 viewingMatrix;
@@ -14,11 +17,6 @@ uniform vec4 materialAmbient;
 uniform vec4 materialDiffuse;
 uniform vec4 materialSpecular;
 uniform float shininess;
-
-varying vec2 fTexCoord;
-
-uniform sampler2D texture;
-
 
 
 //FXAA Learnded form Armin Ronacher
@@ -66,28 +64,39 @@ vec4 applyFXAA(vec2 fragCoord, sampler2D tex)
     return color;
 }
 
-
-
 void main()
 {
+
+    //vec4 L = 2.5*normalize( fPosition ); // Light vector
     vec4 L = normalize( lightPosition - fPosition ); // Light vector
-    vec4 N = fNormal;	// Normal vector
-	vec4 V = normalize( eyePosition - fPosition );		// Eye vector.
+    //vec4 L = normalize( lightPosition - fPosition ); // Light vector
+    vec4 N = fNormal;   // Normal vector
+    vec4 V = normalize( eyePosition - fPosition );      // Eye vector.
     vec4 H = normalize( L + V );  // Halfway vector in the modified Phong model
 
-	N.w = 0.0;
-	N = normalize(N);
-	
+    // Normal variation stored in the texture is within [0,1]. Convert it to [-1, 1]
+    vec4 texel = texture2D( texture, fTexCoord ) * 2.0 - 1.0;
+    
+    // *** Lab Exercise 2: How do you modify N here?
+    //...
+    //N.xyz += texel.xyz;
+    
+    // Make sure N is normalized.
+    N = normalize( N );
+    
     // Compute terms in the illumination equation
     vec4 ambient = materialAmbient;
 
     float Kd = max( dot(L, N), 0.0 );
     vec4  diffuse = Kd * materialDiffuse;
 
-	float Ks = pow( max(dot(N, H), 0.0), shininess );
+    float Ks = pow( max(dot(N, H), 0.0), shininess );
     vec4  specular = Ks * materialSpecular;
 
-	// Ignoring fColor for objects that have no color attributes
-    gl_FragColor = (ambient + diffuse)*texture2D( texture, fTexCoord ) + specular;
-    gl_FragColor *= applyFXAA(fTexCoord, texture);
+    // *** Lab Exercise 2: You will need to change the next line too.
+    //gl_FragColor = (ambient + diffuse) * texture2D( texture, fTexCoord );
+    gl_FragColor = (ambient + diffuse + specular)*texture2D( texture, fTexCoord );// * fColor;
+    //gl_FragColor = texture2D( texture, fTexCoord );// * fColor;
+    //gl_FragColor = (ambient + diffuse + specular) * fColor;
+	gl_FragColor*=applyFXAA(fTexCoord, texture);
 }

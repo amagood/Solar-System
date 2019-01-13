@@ -274,7 +274,7 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
         net_sphere.TEXture( net_image );
     }
     net_sphere.the_buffer(net,program);
-    net_image.src = "moon.jpg";
+    net_image.src = "8k_sun.jpg";
     all_obj.push(net_sphere);
 
     let bor_sphere = new obj_buffer_tex(program);
@@ -308,17 +308,18 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
     shininessLoc = gl.getUniformLocation(program, "shininess");
 
     //event listeners for buttons 
-    document.getElementById( "xButton" ).onclick = rotateX;
-    document.getElementById( "yButton" ).onclick = rotateY;
-    document.getElementById( "zButton" ).onclick = rotateZ;
+
     document.getElementById( "pButton" ).onclick = function() {paused=!paused;};
-    document.getElementById( "dButton" ).onclick = function() {depthTest=!depthTest;};
 	mouseSensitiveXEle=document.getElementById("x_sensitivity");
 	mouseSensitiveYEle=document.getElementById("y_sensitivity");
 	// event handlers for mouse input (borrowed from "Learning WebGL" lesson 11)
 	canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
     //document.onmousemove = handleMouseMove;
+	
+	//prepare for translucent
+	gl.enable(gl.DEPTH_TEST);
+	
 	eventListenerRegister()
     render(canvas,program);
 };
@@ -390,11 +391,11 @@ function render(program) {
       moveDirection[2] += newDirection[0];
     }
 	if (keyboardState['Space']) {
-      moveDirection[1] -= newDirection[1];
+      moveDirection[1] += 0.7;
       
     }
 	if (keyboardState['ShiftLeft']) {
-      moveDirection[1] += newDirection[1];
+      moveDirection[1] -= 0.7;
       
     }
 	
@@ -422,7 +423,7 @@ function render(program) {
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 
     if (! paused) theta[axis] += 0.2;
-	if (depthTest) gl.enable(gl.DEPTH_TEST); else gl.disable(gl.DEPTH_TEST);
+	//if (depthTest) gl.enable(gl.DEPTH_TEST); else gl.disable(gl.DEPTH_TEST);
 
     for(let i = 0;i < obj_count;i++)
     {
@@ -430,7 +431,26 @@ function render(program) {
         gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling) );
         gl.uniformMatrix4fv( viewingLoc,    0, flatten(viewing) );
         gl.uniformMatrix4fv( projectionLoc, 0, flatten(projection) );
+	
+		
+		/*
+		if(i==obj_count-1)
+		{
+			gl.disable(gl.DEPTH_TEST);
+			gl.enable(gl.BLEND);
+			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+			gl.blendEquation(gl.FUNC_SUBSTRACT);
+		}
+		else
+		{
+			gl.disable(gl.BLEND);
+			gl.enable(gl.DEPTH_TEST);
+		}*/
+		
         all_obj[i].the_attribute(program);
+		
+		
+		
         gl.drawArrays( gl.TRIANGLES, 0, sun.numVertices );
 
         

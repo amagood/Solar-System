@@ -174,7 +174,7 @@ function obj_sphere(radius, pos_x, pos_y, pos_z ,degree)
     V[3]=0.0; // convert point to vector
     normalize(V, 1);
     this.normalsArray.push(V);
-    this.colorsArray.push(vec4(1.0, 0.0, 0.0, 1.0));
+    this.colorsArray.push(vec4(1.0, 1.0, 1.0, 0.5));
     this.texcoords.push(0+theta/Math.PI/2.0);//test_for_texcord
     this.texcoords.push(0+phi/Math.PI+0.5);//test_for_texcord
   }
