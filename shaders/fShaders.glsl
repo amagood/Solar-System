@@ -2,6 +2,7 @@ precision mediump float;
 
 // Note that the following are interpolated between vertices.
 varying vec4 fPosition;
+varying vec4 fPosition_weed;
 varying vec4 fColor;  
 varying vec4 fNormal;
 varying vec2 fTexCoord;
@@ -76,12 +77,12 @@ void main()
     }
     else
     {
-        L = -2.0*normalize( fPosition ); // Light vector
+        L = -3.0*normalize( fPosition ); // Light vector
     }
 
-    //vec4 L = 2.5*normalize( fPosition ); // Light vector
+    //vec4 L = -2.0*normalize( fPosition ); // Light vector
     //vec4 L = normalize( lightPosition - fPosition ); // Light vector
-    //vec4 L = normalize( lightPosition - fPosition ); // Light vector
+    //vec4 L = -normalize( lightPosition - fPosition ); // Light vector
     vec4 N = fNormal;   // Normal vector
     vec4 V = normalize( eyePosition - fPosition );      // Eye vector.
     vec4 H = normalize( L + V );  // Halfway vector in the modified Phong model
@@ -99,15 +100,22 @@ void main()
     // Compute terms in the illumination equation
     vec4 ambient = materialAmbient;
 
-    float Kd = max( dot(L, N), 0.0 );
-    vec4  diffuse = Kd * materialDiffuse;
+    float Kd1 = max( dot(L, N), 0.0 );
+    //float Kd = pow(clamp( dot(V, N), 0.0 ,1.0),10.0);//正常
+    //float Kd = pow(clamp( dot(V, N), 0.0 ,1.0),5.0*(sin(fPosition_weed.y*3.14)+1.0));//zooming
+    float Kd = pow(clamp( dot(V, N), 0.0 ,1.0),10.0*(sin((fPosition_weed.y*50.0*3.14+1.0+(sin((fPosition_weed.x)*50.0*3.14)+1.0)))));//weed
+    vec4  diffuse = Kd1 * materialDiffuse;
 
     float Ks = pow( max(dot(N, H), 0.0), shininess );
     vec4  specular = Ks * materialSpecular;
-
+    vec4 black = vec4(0.0,0.0,0.0,1.0);
     // *** Lab Exercise 2: You will need to change the next line too.
     //gl_FragColor = (ambient + diffuse) * texture2D( texture, fTexCoord );
-    //gl_FragColor =vec4((ambient + diffuse + specular)*texture2D( texture, fTexCoord )) ;// * fColor;
+    
+    //gl_FragColor = Kd*((diffuse)*texture2D( texture, fTexCoord ))+ specular+(1.0-Kd)*black;// * fColor;//漸層
+    //gl_FragColor = (ambient + diffuse + specular)*texture2D( texture, fTexCoord );// * fColor;
+    //gl_FragColor = texture2D( texture, fTexCoord );// * fColor;
+    //gl_FragColor = (ambient + diffuse + specular) * fColor;
 
     if(enable_shadow > 0.0)
     {
@@ -117,9 +125,5 @@ void main()
     {
         gl_FragColor = (ambient + diffuse + specular)*texture2D( texture, fTexCoord );// * fColor;
     }
-
-	gl_FragColor.a*=fColor.a;
-    //gl_FragColor = texture2D( texture, fTexCoord );// * fColor;
-    //gl_FragColor = (ambient + diffuse + specular) * fColor;
-	//gl_FragColor*=applyFXAA(fTexCoord, texture);
+	//gl_FragColor*=applyFXAA(fTexCoord,texture);
 }

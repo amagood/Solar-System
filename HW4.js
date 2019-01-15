@@ -9,7 +9,7 @@ var theta = [ 0, 0, 0 ];
 var paused = 0;
 var depthTest = 1;
 
-var obj_count = 10;
+var obj_count = 12;
 
 var all_obj = [];
 var obj_tex = [];
@@ -138,6 +138,7 @@ var texCoord = [
     vec2(1, 0)
 ];
 // ModelView and Projection matrices
+var des_light_loc, des_shadow_loc;
 var modelingLoc, viewingLoc, projectionLoc,shininessLoc;
 var modeling, viewing, projection;
 
@@ -168,24 +169,25 @@ function configureTexture( image , program) {
 
 
 
-var draw_time = 1;
+var draw_time = 1.0;
 
-var sun = new obj_sphere(0.2,0,0,0,0.8,1);
-var mec = new obj_sphere(0.05,0.5,0,0,1.0,1);
-var ven = new obj_sphere(0.05,0.7,0,0,1.0,1);
-var ear = new obj_sphere(0.05,0.9,0,0,1.0,1);
-var moo = new obj_sphere(0.025,0.9,0,0.1,1.0,1);
-var mar = new obj_sphere(0.05,1.1,0,0,1.0,1);
-var jub = new obj_sphere(0.05,1.3,0,0,1.0,1);
-var sat = new obj_sphere(0.05,1.5,0,0,1.0,1);
-var ura = new obj_sphere(0.05,1.7,0,0,1.0,1);
-var net = new obj_sphere(0.05,1.9,0,0,1.0,1);
-var bor = new obj_sphere(0.05,2.1,0,0,1.0,1);
-var back = new obj_sphere(75,0,0,0,1.0,1);
-var test_ring = new obj_ring(0.1,0.06,1.5,0,0,1.0,0.01);
+var sun = new obj_sphere(0.2,0,0,0,0.8,draw_time);
+var mec = new obj_sphere(0.05,0.5,0,0,1.0,draw_time);
+var ven = new obj_sphere(0.05,0.7,0,0,1.0,draw_time);
+var ear = new obj_sphere(0.05,0.9,0,0,1.0,draw_time);
+var moo = new obj_sphere(0.025,0.9,0,0.1,1.0,draw_time);
+var mar = new obj_sphere(0.05,1.1,0,0,1.0,draw_time);
+var jub = new obj_sphere(0.05,1.3,0,0,1.0,draw_time);
+var sat = new obj_sphere(0.05,1.5,0,0,1.0,draw_time);
+var ura = new obj_sphere(0.05,1.7,0,0,1.0,draw_time);
+var net = new obj_sphere(0.05,1.9,0,0,1.0,draw_time);
+var bor = new obj_sphere(0.05,2.1,0,0,1.0,draw_time);
+var back = new obj_sphere(30,0,0,0,1.0,draw_time);
+var test_ring = new obj_ring(0.1,0.06,1.5,0,0,1.0,draw_time/10);
 
  function init()
 {
+	//ResourceConstraints::set_max_old_space_size(12000);
     var canvas = document.getElementById( "gl-canvas" );
     
     gl = WebGLUtils.setupWebGL( canvas );
@@ -477,19 +479,19 @@ function render(program) {
 	
 		
 		
-    		if(i==0)
-    		{
-    			//gl.disable(gl.DEPTH_TEST);
-    			gl.enable(gl.BLEND);
-    			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-    			gl.blendEquation(gl.FUNC_SUBSTRACT);
-    		}
-    		else
-    		{
-    			gl.disable(gl.BLEND);
-    			gl.enable(gl.DEPTH_TEST);
-    			gl.depthMask(true);
-    		}
+		if(i==obj_count-1)
+		{
+			//gl.disable(gl.DEPTH_TEST);
+			gl.enable(gl.BLEND);
+			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
+			gl.blendEquation(gl.FUNC_SUBSTRACT);
+		}
+		else
+		{
+			gl.disable(gl.BLEND);
+			gl.enable(gl.DEPTH_TEST);
+			gl.depthMask(true);
+		}
 		
         all_obj[i].the_attribute(program);
 		
@@ -503,10 +505,11 @@ function render(program) {
         //gl.drawArrays( gl.LINE_LOOP, 0, sun.numVertices);
         //gl.drawArrays( gl.TRIANGLES, 0, ball.numVertices);
     }
+	/*
     gl.disable(gl.BLEND);
     gl.enable(gl.DEPTH_TEST);
     gl.depthMask(true);
-
+*/
     enable_light = all_obj[12].enable_light;
     enable_shadow = all_obj[12].enable_shadow;
     gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling) );
