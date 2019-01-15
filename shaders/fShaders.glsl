@@ -18,6 +18,9 @@ uniform vec4 materialDiffuse;
 uniform vec4 materialSpecular;
 uniform float shininess;
 
+uniform float enable_light;
+uniform float enable_shadow;
+
 
 //FXAA Learnded form Armin Ronacher
 #define FXAA_REDUCE_MIN   (1.0/ 128.0)
@@ -66,9 +69,18 @@ vec4 applyFXAA(vec2 fragCoord, sampler2D tex)
 
 void main()
 {
+    vec4 L;
+    if(enable_light > 0.0)
+    {
+        L = normalize( lightPosition - fPosition ); // Light vector
+    }
+    else
+    {
+        L = -2.0*normalize( fPosition ); // Light vector
+    }
 
     //vec4 L = 2.5*normalize( fPosition ); // Light vector
-    vec4 L = normalize( lightPosition - fPosition ); // Light vector
+    //vec4 L = normalize( lightPosition - fPosition ); // Light vector
     //vec4 L = normalize( lightPosition - fPosition ); // Light vector
     vec4 N = fNormal;   // Normal vector
     vec4 V = normalize( eyePosition - fPosition );      // Eye vector.
@@ -95,7 +107,17 @@ void main()
 
     // *** Lab Exercise 2: You will need to change the next line too.
     //gl_FragColor = (ambient + diffuse) * texture2D( texture, fTexCoord );
-    gl_FragColor =vec4((ambient + diffuse + specular)*texture2D( texture, fTexCoord )) ;// * fColor;
+    //gl_FragColor =vec4((ambient + diffuse + specular)*texture2D( texture, fTexCoord )) ;// * fColor;
+
+    if(enable_shadow > 0.0)
+    {
+        gl_FragColor = texture2D( texture, fTexCoord );// * fColor;
+    }
+    else
+    {
+        gl_FragColor = (ambient + diffuse + specular)*texture2D( texture, fTexCoord );// * fColor;
+    }
+
 	gl_FragColor.a*=fColor.a;
     //gl_FragColor = texture2D( texture, fTexCoord );// * fColor;
     //gl_FragColor = (ambient + diffuse + specular) * fColor;
