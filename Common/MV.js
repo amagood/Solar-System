@@ -560,8 +560,7 @@ function normalize( u, excludeLastComponent )
     var len = length( u );
 
     if ( !isFinite(len) ) {
-        //throw "normalize: vector " + u + " has zero length" + "OWO";
-		return u;
+        throw "normalize: vector " + u + " has zero length";
     }
     
     for ( var i = 0; i < u.length; ++i ) {
@@ -608,7 +607,7 @@ function scalev( s, u )
 
     result = [];
     for ( var i = 0; i < u.length; ++i ) {
-        result.push( s * u[i] );
+        result.push( s*u[i] );
     }
     
     return result;

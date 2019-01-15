@@ -31,7 +31,7 @@ uniform float enable_shadow;
 vec4 applyFXAA(vec2 fragCoord, sampler2D tex)
 {
     vec4 color;
-    vec2 inverseVP = vec2(1.0 / 1920.0, 1.0 / 1080.0);
+    vec2 inverseVP = vec2(1.0 / fragCoord.x, 1.0 / fragCoord.y);
     vec3 rgbNW = texture2D(tex, (fragCoord + vec2(-1.0, -1.0)) * inverseVP).xyz;
     vec3 rgbNE = texture2D(tex, (fragCoord + vec2(1.0, -1.0)) * inverseVP).xyz;
     vec3 rgbSW = texture2D(tex, (fragCoord + vec2(-1.0, 1.0)) * inverseVP).xyz;
@@ -125,5 +125,6 @@ void main()
     {
         gl_FragColor = (ambient + diffuse + specular)*texture2D( texture, fTexCoord );// * fColor;
     }
-	//gl_FragColor*=applyFXAA(fTexCoord,texture);
+	gl_FragColor.a*=fColor.a;
+	//gl_FragColor=applyFXAA(fTexCoord,texture);
 }

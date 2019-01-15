@@ -110,24 +110,6 @@ function rotateZ() {
 	axis = zAxis;
 };
 
-function unitize(vertices)
-{
-	var maxCorner = vertices[0];
-	var minCorner = vertices[0];
-	var center = vertices[0];
- 
-	for (i = 1; i < vertices.length; i++) { 
-		maxCorner = Math.max(vertices[i], maxCorner);
-		minCorner = Math.min(vertices[i], minCorner);
-	}
-	for (j=0; j<3; j++) {
-		center = (maxCorner+minCorner)/2.0;
-	}
-		
-	for (i = 0; i < vertices.length; i++) { 
-		vertices[i] = (vertices[i] - center) * 2.0 / (maxCorner - minCorner);
-	}		
-}
 
 
 var texture;
@@ -145,11 +127,11 @@ var modeling, viewing, projection;
 var eyePosition   = vec4( 0.0, 1.0, 2.0, 1.0 );
 var lookPos=[0,0,0];
 var upPos=[0,1,0];
-var lightPosition = vec4( 10.0, 10.0, 20.0, 1.0 );
+var lightPosition = vec4( 0.0, 2.0, 0.0, 1.0 );
 
-var materialAmbient = vec4( 0.25, 0.25, 0.25, 1.0 );
-var materialDiffuse = vec4( 0.8, 0.8, 0.7, 1.0);
-var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+var materialAmbient = vec4( 0.05, 0.05, 0.05, 1.0 );
+var materialDiffuse = vec4( 0.8, 0.8, 0.8, 1.0);
+var materialSpecular = vec4( 0.8, 0.8,0.8, 0.8 );
 var materialShininess = 100.0;
 
 
@@ -169,9 +151,9 @@ function configureTexture( image , program) {
 
 
 
-var draw_time = 1.0;
+var draw_time = 10.0;
 
-var sun = new obj_sphere(0.2,0,0,0,0.8,draw_time);
+var sun = new obj_sphere(0.2,0,0,0,0.5,draw_time);
 var mec = new obj_sphere(0.05,0.5,0,0,1.0,draw_time);
 var ven = new obj_sphere(0.05,0.7,0,0,1.0,draw_time);
 var ear = new obj_sphere(0.05,0.9,0,0,1.0,draw_time);
@@ -190,12 +172,13 @@ var test_ring = new obj_ring(0.1,0.06,1.5,0,0,1.0,draw_time/10);
 	//ResourceConstraints::set_max_old_space_size(12000);
     var canvas = document.getElementById( "gl-canvas" );
     
-    gl = WebGLUtils.setupWebGL( canvas );
+    gl = WebGLUtils.setupWebGL( canvas,  { alpha: false } );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
     //
     //  Configure WebGL
     //
+	//setBackgroundColor(0.0,0.0,0.0,1.0);
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
     
@@ -346,7 +329,7 @@ var test_ring = new obj_ring(0.1,0.06,1.5,0,0,1.0,draw_time/10);
        flatten(materialDiffuse) );
     gl.uniform4fv( gl.getUniformLocation(program, "materialSpecular"), 
        flatten(materialSpecular) );	       
-    shininessLoc = gl.getUniformLocation(program, "shininess");
+    gl.uniform1f( gl.getUniformLocation(program, "shininess"), materialShininess);
 
     //event listeners for buttons 
 
@@ -484,7 +467,7 @@ function render(program) {
 			//gl.disable(gl.DEPTH_TEST);
 			gl.enable(gl.BLEND);
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-			gl.blendEquation(gl.FUNC_SUBSTRACT);
+			gl.blendEquation(gl.FUNC_ADD);
 		}
 		else
 		{

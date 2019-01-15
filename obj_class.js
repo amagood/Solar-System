@@ -5,7 +5,9 @@ class obj_buffer_tex
     this.VertexPosition_Buffer = null;
     this.VertexNormal_Buffer = null;
     this.VertexTextureCoordinate_Buffer = null;
-    this.lne = 0;
+    this.len = 0;
+    this.theta = [ 0, 0, 0 ];
+    this.speed = 0.2;
     //this.IndicesBuffer = null;
     //this.IndicesLen = 0;
     this.Texture_Buffer = null;
@@ -28,7 +30,7 @@ class obj_buffer_tex
     this.VertexPosition_Buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VertexPosition_Buffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.pointsArray), gl.STATIC_DRAW);
-    this.len = obj.pointsArray.lenght;
+    this.len = obj.numVertices;
 
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
@@ -80,6 +82,7 @@ class obj_buffer_tex
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VertexPosition_Buffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.pointsArray), gl.STATIC_DRAW);
     // color array atrribute buffer
+    this.len = obj.numVertices;
     
     this.VertexColor_Buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VertexColor_Buffer);
@@ -132,7 +135,7 @@ class obj_buffer_tex
     //gl.pixelStorei(gl.UNPACK_PREMULTIPLY_ALPHA_WEBGL, true);
     gl.texImage2D(gl.TEXTURE_2D, 0, gl.RGB, gl.RGB, gl.UNSIGNED_BYTE, image);
     gl.generateMipmap(gl.TEXTURE_2D);
-    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.NEAREST_MIPMAP_LINEAR);
+    gl.texParameteri(gl.TEXTURE_2D, gl.TEXTURE_MIN_FILTER, gl.LINEAR);
     //gl.uniform1i(this.tex_loc, 0);
 
   }
