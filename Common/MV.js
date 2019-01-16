@@ -607,7 +607,7 @@ function scalev( s, u )
 
     result = [];
     for ( var i = 0; i < u.length; ++i ) {
-        result.push( s * u[i] );
+        result.push( s*u[i] );
     }
     
     return result;
