@@ -154,7 +154,7 @@ function ring(innerRadius, outerRadius, slices) {
  *    is the number of vertical slices, bounded by lines of latitude, the
  *    north pole and the south pole.)
  */
-function obj_sphere(radius, pos_x, pos_y, pos_z ,degree)
+function obj_sphere(radius, pos_x, pos_y, pos_z ,alpha ,degree)
 {
   
   this.numVertices = 0;
@@ -165,16 +165,19 @@ function obj_sphere(radius, pos_x, pos_y, pos_z ,degree)
 
   let tex_index = 0;//test_for_texcord
   this.spherePoint = function (theta, phi) {
-    var V = vec4(radius*Math.cos(theta)*Math.cos(phi)+pos_x/radius, radius*Math.sin(phi)+pos_y/radius, radius*Math.sin(theta)*Math.cos(phi)+pos_z/radius, 1.0);//計算座標
+    var V = vec4(radius*Math.cos(theta)*Math.cos(phi)+pos_x, radius*Math.sin(phi)+pos_y, radius*Math.sin(theta)*Math.cos(phi)+pos_z, 1.0);//計算座標
     //var V = vec4(Math.cos(theta)*Math.cos(phi)+pos_x/radius, 0, Math.sin(theta)*Math.cos(phi)+pos_z/radius, 1.0);
     var smallV = scalev(radius, V); // scale the sphere to the range of [-0.5, 0.5]
 
     
     this.pointsArray.push(smallV);
-    V[3]=0.0; // convert point to vector
+    V[3]=0.0;
+    V[0]-=pos_x;
+    V[1]-=pos_y;
+    V[2]-=pos_z; // convert point to vector
     normalize(V, 1);
     this.normalsArray.push(V);
-    this.colorsArray.push(vec4(1.0, 1.0, 1.0, 0.2));
+    this.colorsArray.push(vec4(1.0, 0.0, 0.0, alpha));
     this.texcoords.push(0+theta/Math.PI/2.0);//test_for_texcord
     this.texcoords.push(0+phi/Math.PI+0.5);//test_for_texcord
   }
@@ -214,7 +217,7 @@ function obj_sphere(radius, pos_x, pos_y, pos_z ,degree)
 
 
 
-function obj_ring(inner_radius,outer_radius, pos_x, pos_y, pos_z,degree)
+function obj_ring(inner_radius,outer_radius, pos_x, pos_y, pos_z ,alpha ,degree)
 {
   this.numVertices = 0;
   this.pointsArray = [];
@@ -222,14 +225,17 @@ function obj_ring(inner_radius,outer_radius, pos_x, pos_y, pos_z,degree)
   this.normalsArray = [];
   this.texcoords = [];
   this.spherePoint = function (theta, radius) {
-    var V = vec4(radius*Math.cos(theta)+pos_x/radius, 0+pos_y/radius, radius*Math.sin(theta)+pos_z/radius, 1.0);//計算座標
+    var V = vec4(radius*Math.cos(theta)+pos_x, 0+pos_y, radius*Math.sin(theta)+pos_z, 1.0);//計算座標
     var smallV = scalev(radius, V); // scale the sphere to the range of [-0.5, 0.5]
     
     this.pointsArray.push(smallV);
-    V[3]=0.0; // convert point to vector
+    V[3]=0.0;
+    V[0]-=pos_x;
+    V[1]-=pos_y;
+    V[2]-=pos_z; // convert point to vector
     normalize(V, 1);
     this.normalsArray.push(V);
-    this.colorsArray.push(vec4(1.0, 0.0, 0.0, 1.0));
+    this.colorsArray.push(vec4(1.0, 0.0, 0.0, alpha));
   }
 
   var step = degree;//模組細節度->>推測 改得越低->>越圓
@@ -241,13 +247,25 @@ function obj_ring(inner_radius,outer_radius, pos_x, pos_y, pos_z,degree)
     rT2 = theta / 180.0 * Math.PI;
       
     this.spherePoint(rT1, inner_radius);
+    this.texcoords.push(1);//test_for_texcord
+    this.texcoords.push(1);
     this.spherePoint(rT2, outer_radius);
+    this.texcoords.push(0);//test_for_texcord
+    this.texcoords.push(0);
     this.spherePoint(rT1, outer_radius);
+    this.texcoords.push(1);//test_for_texcord
+    this.texcoords.push(0);
     this.numVertices += 3;
       
     this.spherePoint(rT2, outer_radius);
+    this.texcoords.push(0);//test_for_texcord
+    this.texcoords.push(0);
     this.spherePoint(rT1, inner_radius);
+    this.texcoords.push(1);//test_for_texcord
+    this.texcoords.push(1);
     this.spherePoint(rT2, inner_radius);
+    this.texcoords.push(0);//test_for_texcord
+    this.texcoords.push(1);
     this.numVertices += 3;
     lastTheta = theta;
   }     

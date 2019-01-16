@@ -9,10 +9,13 @@ var theta = [ 0, 0, 0 ];
 var paused = 0;
 var depthTest = 1;
 
-var obj_count = 10;
+var obj_count = 12;
 
 var all_obj = [];
 var obj_tex = [];
+
+var enable_light = 0;
+var enable_shadow = 0;
 
 var width,height;
 // event handlers for mouse input (borrowed from "Learning WebGL" lesson 11)
@@ -107,24 +110,6 @@ function rotateZ() {
 	axis = zAxis;
 };
 
-function unitize(vertices)
-{
-	var maxCorner = vertices[0];
-	var minCorner = vertices[0];
-	var center = vertices[0];
- 
-	for (i = 1; i < vertices.length; i++) { 
-		maxCorner = Math.max(vertices[i], maxCorner);
-		minCorner = Math.min(vertices[i], minCorner);
-	}
-	for (j=0; j<3; j++) {
-		center = (maxCorner+minCorner)/2.0;
-	}
-		
-	for (i = 0; i < vertices.length; i++) { 
-		vertices[i] = (vertices[i] - center) * 2.0 / (maxCorner - minCorner);
-	}		
-}
 
 
 var texture;
@@ -135,17 +120,18 @@ var texCoord = [
     vec2(1, 0)
 ];
 // ModelView and Projection matrices
+var des_light_loc, des_shadow_loc;
 var modelingLoc, viewingLoc, projectionLoc,shininessLoc;
 var modeling, viewing, projection;
 
 var eyePosition   = vec4( 0.0, 1.0, 2.0, 1.0 );
 var lookPos=[0,0,0];
 var upPos=[0,1,0];
-var lightPosition = vec4( 10.0, 10.0, 20.0, 1.0 );
+var lightPosition = vec4( 0.0, 2.0, 0.0, 1.0 );
 
-var materialAmbient = vec4( 0.25, 0.25, 0.25, 1.0 );
-var materialDiffuse = vec4( 0.8, 0.8, 0.7, 1.0);
-var materialSpecular = vec4( 1.0, 1.0, 1.0, 1.0 );
+var materialAmbient = vec4( 0.05, 0.05, 0.05, 1.0 );
+var materialDiffuse = vec4( 0.8, 0.8, 0.8, 1.0);
+var materialSpecular = vec4( 0.8, 0.8,0.8, 0.8 );
 var materialShininess = 100.0;
 
 
@@ -165,29 +151,34 @@ function configureTexture( image , program) {
 
 
 
-var draw_time = 1;
+var draw_time = 10.0;
 
-var sun = new obj_sphere(0.2,0,0,0,draw_time);
-var mec = new obj_sphere(0.1,0.05,0,0,draw_time);
-var ven = new obj_sphere(0.1,0.1,0,0,draw_time);
-var ear = new obj_sphere(0.1,0.15,0,0,draw_time);
-var mar = new obj_sphere(0.1,0.2,0,0,draw_time);
-var jub = new obj_sphere(0.1,0.25,0,0,draw_time);
-var sat = new obj_sphere(0.1,0.3,0,0,draw_time);
-var ura = new obj_sphere(0.1,0.35,0,0,draw_time);
-var net = new obj_sphere(0.1,0.4,0,0,draw_time);
-var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
+var sun = new obj_sphere(0.2,0,0,0,0.5,draw_time);
+var mec = new obj_sphere(0.05,0.5,0,0,1.0,draw_time);
+var ven = new obj_sphere(0.05,0.7,0,0,1.0,draw_time);
+var ear = new obj_sphere(0.05,0.9,0,0,1.0,draw_time);
+var moo = new obj_sphere(0.025,0.9,0,0.1,1.0,draw_time);
+var mar = new obj_sphere(0.05,1.1,0,0,1.0,draw_time);
+var jub = new obj_sphere(0.05,1.3,0,0,1.0,draw_time);
+var sat = new obj_sphere(0.05,1.5,0,0,1.0,draw_time);
+var ura = new obj_sphere(0.05,1.7,0,0,1.0,draw_time);
+var net = new obj_sphere(0.05,1.9,0,0,1.0,draw_time);
+var bor = new obj_sphere(0.05,2.1,0,0,1.0,draw_time);
+var back = new obj_sphere(30,0,0,0,1.0,draw_time);
+var test_ring = new obj_ring(0.1,0.06,1.5,0,0,1.0,draw_time/10);
 
  function init()
 {
+	//ResourceConstraints::set_max_old_space_size(12000);
     var canvas = document.getElementById( "gl-canvas" );
     
-    gl = WebGLUtils.setupWebGL( canvas );
+    gl = WebGLUtils.setupWebGL( canvas,  { alpha: false } );
     if ( !gl ) { alert( "WebGL isn't available" ); }
 
     //
     //  Configure WebGL
     //
+	//setBackgroundColor(0.0,0.0,0.0,1.0);
     gl.viewport( 0, 0, canvas.width, canvas.height );
     gl.clearColor( 0.0, 0.0, 0.0, 1.0 );
     
@@ -196,14 +187,7 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
     var program = initShaders( gl, "./shaders/vShader.glsl", "./shaders/fShaders.glsl" );
     gl.useProgram( program );
 
-    let sun_sphere = new obj_buffer_tex(program);
-    var sun_image = new Image();
-    sun_image.onload = function() { 
-        sun_sphere.TEXture( sun_image );
-    }
-    sun_sphere.the_buffer(sun,program);
-    sun_image.src = "8k_sun.png";
-    all_obj.push(sun_sphere);
+    
 
     let mec_sphere = new obj_buffer_tex(program);
     var mec_image = new Image();
@@ -229,8 +213,17 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
         ear_sphere.TEXture( ear_image );
     }
     ear_sphere.the_buffer(ear,program);
-    ear_image.src = "moon.jpg";
+    ear_image.src = "earth.jpg";
     all_obj.push(ear_sphere);
+
+    let moo_sphere = new obj_buffer_tex(program);
+    var moo_image = new Image();
+    moo_image.onload = function() { 
+        moo_sphere.TEXture( moo_image );
+    }
+    moo_sphere.the_buffer(moo,program);
+    moo_image.src = "moon.jpg";
+    all_obj.push(moo_sphere);
 
     let mar_sphere = new obj_buffer_tex(program);
     var mar_image = new Image();
@@ -265,7 +258,7 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
         ura_sphere.TEXture( ura_image );
     }
     ura_sphere.the_buffer(ura,program);
-    ura_image.src = "moon.jpg";
+    ura_image.src = "ura.jpg";
     all_obj.push(ura_sphere);
 
     let net_sphere = new obj_buffer_tex(program);
@@ -274,7 +267,7 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
         net_sphere.TEXture( net_image );
     }
     net_sphere.the_buffer(net,program);
-    net_image.src = "8k_sun.png";
+    net_image.src = "nep.jpg";
     all_obj.push(net_sphere);
 
     let bor_sphere = new obj_buffer_tex(program);
@@ -283,8 +276,37 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
         bor_sphere.TEXture( bor_image );
     }
     bor_sphere.the_buffer(bor,program);
-    bor_image.src = "moon.jpg";
+    bor_image.src = "bor.jpg";
     all_obj.push(bor_sphere);
+
+    let back_sphere = new obj_buffer_tex(program);
+    var back_image = new Image();
+    back_image.onload = function() { 
+        back_sphere.TEXture( back_image );
+    }
+    back_sphere.the_buffer(back,program);
+    back_image.src = "back.jpg";
+    all_obj.push(back_sphere);
+
+    let sun_sphere = new obj_buffer_tex(program);
+    var sun_image = new Image();
+    sun_image.onload = function() { 
+        sun_sphere.TEXture( sun_image );
+    }
+    sun_sphere.the_buffer(sun,program);
+    sun_sphere.enable_light = 1.0;
+    sun_sphere.enable_shadow = 1.0;
+    sun_image.src = "8k_sun.png";
+    all_obj.push(sun_sphere);
+
+    let test_ring_tex = new obj_buffer_tex(program);
+    var ring_image = new Image();
+    ring_image.onload = function() { 
+        test_ring_tex.TEXture( ring_image );
+    }
+    test_ring_tex.the_buffer(test_ring,program);
+    ring_image.src = "ring.jpg";
+    all_obj.push(test_ring_tex);
 
     
     	
@@ -294,6 +316,8 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
     modelingLoc   = gl.getUniformLocation(program, "modelingMatrix"); 
     viewingLoc    = gl.getUniformLocation(program, "viewingMatrix"); 
     projectionLoc = gl.getUniformLocation(program, "projectionMatrix"); 
+    des_light_loc = gl.getUniformLocation(program, "enable_light");
+    des_shadow_loc = gl.getUniformLocation(program, "enable_shadow");
 
     gl.uniform4fv( gl.getUniformLocation(program, "eyePosition"), 
        flatten(eyePosition) );
@@ -305,7 +329,7 @@ var bor = new obj_sphere(0.1,0.45,0,0,draw_time);
        flatten(materialDiffuse) );
     gl.uniform4fv( gl.getUniformLocation(program, "materialSpecular"), 
        flatten(materialSpecular) );	       
-    shininessLoc = gl.getUniformLocation(program, "shininess");
+    gl.uniform1f( gl.getUniformLocation(program, "shininess"), materialShininess);
 
     //event listeners for buttons 
 
@@ -428,18 +452,22 @@ function render(program) {
     for(let i = 0;i < obj_count;i++)
     {
         //let render_obj = all_obj[i];
+        enable_light = all_obj[i].enable_light;
+        enable_shadow = all_obj[i].enable_shadow;
         gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling) );
         gl.uniformMatrix4fv( viewingLoc,    0, flatten(viewing) );
         gl.uniformMatrix4fv( projectionLoc, 0, flatten(projection) );
+        gl.uniform1f( des_light_loc, enable_light);
+        gl.uniform1f( des_shadow_loc, enable_shadow);
 	
 		
 		
-		if(i==0)
+		if(i==obj_count-1)
 		{
 			//gl.disable(gl.DEPTH_TEST);
 			gl.enable(gl.BLEND);
 			gl.blendFunc(gl.SRC_ALPHA, gl.ONE_MINUS_SRC_ALPHA);
-			gl.blendEquation(gl.FUNC_SUBSTRACT);
+			gl.blendEquation(gl.FUNC_ADD);
 		}
 		else
 		{
@@ -460,6 +488,20 @@ function render(program) {
         //gl.drawArrays( gl.LINE_LOOP, 0, sun.numVertices);
         //gl.drawArrays( gl.TRIANGLES, 0, ball.numVertices);
     }
+	/*
+    gl.disable(gl.BLEND);
+    gl.enable(gl.DEPTH_TEST);
+    gl.depthMask(true);
+*/
+    enable_light = all_obj[12].enable_light;
+    enable_shadow = all_obj[12].enable_shadow;
+    gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling) );
+    gl.uniformMatrix4fv( viewingLoc,    0, flatten(viewing) );
+    gl.uniformMatrix4fv( projectionLoc, 0, flatten(projection) );
+    gl.uniform1f( des_light_loc, enable_light);
+    gl.uniform1f( des_shadow_loc, enable_shadow);
+    all_obj[12].the_attribute(program);
+    gl.drawArrays( gl.LINE_LOOP, 0, test_ring.numVertices );
 
     requestAnimFrame( render );
 }
