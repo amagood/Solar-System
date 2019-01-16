@@ -159,7 +159,7 @@ var sun_in = new obj_sphere(3.99/10,0*AU,0,0,0.5,5);
 var mec = new obj_sphere(0.383/10,0.39*AU,0,0,1.0,5);
 var ven = new obj_sphere(0.95/10,0.72*AU,0,0,1.0,5);
 var ear = new obj_sphere(1.0/10,1.0*AU,0,0,1.0,5);
-var moo = new obj_sphere(0.273/10,1.0*AU,0,0.15,1.0,5);
+var moo = new obj_sphere(0.273/10,1.0*AU,0,0.2,1.0,5);
 var mar = new obj_sphere(0.532/10,1.42*AU,0,0,1.0,5);
 var jub = new obj_sphere(1.97/10,2.5*AU,0,0,1.0,5);
 var sat = new obj_sphere(1.1/10,3.2*AU,0,0,1.0,5);
@@ -200,6 +200,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     sun_in_sphere.the_buffer(sun_in,program);
     sun_in_sphere.speed = -0.1;
     sun_in_sphere.Axis = 2;
+    sun_in_sphere.self_speed = 0.1;
     //sun_sphere.enable_light = 1.0;
     sun_in_sphere.enable_shadow = 1.0;
     sun_in_image.src = "8k_sun.jpg";
@@ -212,6 +213,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     mec_sphere.the_buffer(mec,program);
     mec_sphere.speed = -1.0;
+    mec_sphere.self_speed = 0.5;
     mec_image.src = "mec.jpg";
     all_obj.push(mec_sphere);
 
@@ -222,6 +224,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     ven_sphere.the_buffer(ven,program);
     ven_sphere.speed = -0.5;
+    ven_sphere.self_speed = -2.0;
     ven_image.src = "ve.jpg";
     all_obj.push(ven_sphere);
 
@@ -232,7 +235,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     ear_sphere.the_buffer(ear,program);
     ear_sphere.speed = 0.3;
-    ear_sphere.self_Axis = 1;
+    ear_sphere.self_speed = 1.0;
     ear_image.src = "earth.jpg";
     all_obj.push(ear_sphere);
 
@@ -243,6 +246,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     moo_sphere.the_buffer(moo,program);
     moo_sphere.speed = 0.3;
+    moo_sphere.self_speed = -1.0;
     moo_sphere.location[2] = 0.0;
     moo_image.src = "moon.jpg";
     all_obj.push(moo_sphere);
@@ -254,6 +258,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     mar_sphere.the_buffer(mar,program);
     mar_sphere.speed = -0.3;
+    mar_sphere.self_speed = 1.5;
     mar_image.src = "mars.jpg";
     all_obj.push(mar_sphere);
 
@@ -264,6 +269,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     jub_sphere.the_buffer(jub,program);
     jub_sphere.speed = 0.7;
+    jub_sphere.self_speed = 0.5;
     jub_image.src = "ju.jpg";
     all_obj.push(jub_sphere);
 
@@ -274,6 +280,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     sat_sphere.the_buffer(sat,program);
     sat_sphere.speed = -0.8;
+    sat_sphere.self_speed = 0.7;
     sat_image.src = "sa.jpg";
     all_obj.push(sat_sphere);
 
@@ -284,6 +291,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     ura_sphere.the_buffer(ura,program);
     ura_sphere.speed = 0.1;
+    ura_sphere.self_speed = 0.2;
     ura_image.src = "ura.jpg";
     all_obj.push(ura_sphere);
 
@@ -294,6 +302,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     net_sphere.the_buffer(net,program);
     net_sphere.speed = -0.05;
+    net_sphere.self_speed = 0.1;
     net_image.src = "nep.jpg";
     all_obj.push(net_sphere);
 
