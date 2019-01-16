@@ -55,7 +55,8 @@ function handleMouseUp(event) {
 
 var mouseSensitiveXEle;
 var mouseSensitiveYEle;
-
+var FOVcfg;
+var transp;
 
 var mouseMove = [0, 0];
 function handleCanvasMouseMove(event) {
@@ -374,6 +375,10 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
 	canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
     //document.onmousemove = handleMouseMove;
+	FOVcfg=document.getElementById("FOVcfg");
+	//transp=document.getElementById("transp");
+	FOVcfg.value=60;
+	//transp.value=2;
 	
 	//prepare for translucent
 	gl.enable(gl.DEPTH_TEST);
@@ -474,7 +479,7 @@ function render(program) {
 	
 	viewing = lookAt(vec3(eyePosition), lookPos, upPos);//eyePosition  lookPos upPos
 
-	projection = perspective(60, canvas.width/canvas.height, 0.1, 1000.0);  /// (FOV, proportion, nearest(smaller is better),farest(larger is better))
+	projection = perspective(FOVcfg.value, canvas.width/canvas.height, 0.1, 1000.0);  /// (FOV, proportion, nearest(smaller is better),farest(larger is better))
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 	//if (depthTest) gl.enable(gl.DEPTH_TEST); else gl.disable(gl.DEPTH_TEST);

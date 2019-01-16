@@ -60,6 +60,9 @@ function handleKeyDown(event) {
   case 'f':
     handleFullscreen();
     break;
+  case 'p':
+    paused=!paused;
+	break;
   }
 }
 
