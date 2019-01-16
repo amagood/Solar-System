@@ -9,7 +9,7 @@ var theta = [ 0, 0, 0 ];
 var paused = 0;
 var depthTest = 1;
 
-var obj_count = 14;
+var obj_count = 15;
 
 var all_obj = [];
 var obj_tex = [];
@@ -159,6 +159,7 @@ var sun_in = new obj_sphere(3.99/10,0*AU,0,0,0.5,5);
 var mec = new obj_sphere(0.383/10,0.39*AU,0,0,1.0,5);
 var ven = new obj_sphere(0.95/10,0.72*AU,0,0,1.0,5);
 var ear = new obj_sphere(1.0/10,1.0*AU,0,0,1.0,5);
+var ear_clo = new obj_sphere(1.02/10,1.0*AU,0,0,0.15,5);
 var moo = new obj_sphere(0.273/10,1.0*AU,0,0.2,1.0,5);
 var mar = new obj_sphere(0.532/10,1.42*AU,0,0,1.0,5);
 var jub = new obj_sphere(1.97/10,2.5*AU,0,0,1.0,5);
@@ -352,6 +353,16 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     sun_image.src = "8k_sun.jpg";
     all_obj.push(sun_sphere);
 
+    let clo_sphere = new obj_buffer_tex(program);
+    var clo_image = new Image();
+    clo_image.onload = function() { 
+        clo_sphere.TEXture( clo_image );
+    }
+    clo_sphere.the_buffer(ear_clo,program);
+    clo_sphere.speed = 0.3;
+    clo_sphere.self_speed = 0.2;
+    clo_image.src = "8k_clouds.jpg";
+    all_obj.push(clo_sphere);
     
     	
     
@@ -516,7 +527,7 @@ function render(program) {
         
 		
 		
-		if(i==obj_count-1)
+		if(i==obj_count-1 || i==obj_count-2)
 		{
 			//gl.disable(gl.DEPTH_TEST);
 			gl.enable(gl.BLEND);
