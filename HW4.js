@@ -9,6 +9,7 @@ var theta = [ 0, 0, 0 ];
 var paused = 0;
 var depthTest = 1;
 
+
 var obj_count = 14;
 
 var all_obj = [];
@@ -133,6 +134,7 @@ var lightPosition = vec4( 0.0, 2.0, 0.0, 1.0 );
 var materialAmbient = vec4( 0.05, 0.05, 0.05, 1.0 );
 var materialDiffuse = vec4( 0.8, 0.8, 0.8, 1.0);
 var materialSpecular = vec4( 0.8, 0.8,0.8, 0.8 );
+
 var materialShininess = 50.0;
 
 
@@ -153,6 +155,7 @@ function configureTexture( image , program) {
 
 var AU = 2;
 var draw_time = 10.0;
+
 
 var sun = new obj_sphere(4.0/10,0*AU,0,0,0.5,5);
 var sun_in = new obj_sphere(3.99/10,0*AU,0,0,0.5,5);
@@ -191,6 +194,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     gl.useProgram( program );
 
     
+
 	let test_ring_tex = new obj_buffer_tex(program);
     var ring_image = new Image();
     ring_image.onload = function() { 
@@ -214,6 +218,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     sun_in_image.src = "8k_sun.jpg";
     all_obj.push(sun_in_sphere);
     
+
     let mec_sphere = new obj_buffer_tex(program);
     var mec_image = new Image();
     mec_image.onload = function() { 
@@ -240,7 +245,9 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         ear_sphere.TEXture( ear_image );
     }
     ear_sphere.the_buffer(ear,program);
+
     ear_sphere.speed = 0.8;
+
     ear_image.src = "earth.jpg";
     all_obj.push(ear_sphere);
 
@@ -250,7 +257,9 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         moo_sphere.TEXture( moo_image );
     }
     moo_sphere.the_buffer(moo,program);
+
     moo_sphere.speed = 0.8;
+
     moo_image.src = "moon.jpg";
     all_obj.push(moo_sphere);
 
@@ -290,7 +299,9 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         ura_sphere.TEXture( ura_image );
     }
     ura_sphere.the_buffer(ura,program);
+
     ura_sphere.speed = 0.1;
+
     ura_image.src = "ura.jpg";
     all_obj.push(ura_sphere);
 
@@ -300,7 +311,9 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         net_sphere.TEXture( net_image );
     }
     net_sphere.the_buffer(net,program);
+
     net_sphere.speed = -0.05;
+
     net_image.src = "nep.jpg";
     all_obj.push(net_sphere);
 
@@ -310,7 +323,9 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         bor_sphere.TEXture( bor_image );
     }
     bor_sphere.the_buffer(bor,program);
+
     bor_sphere.speed = -0.3;
+
     bor_image.src = "bor.jpg";
     all_obj.push(bor_sphere);
 
@@ -320,12 +335,12 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         back_sphere.TEXture( back_image );
     }
     back_sphere.the_buffer(back,program);
+
     back_sphere.speed = 0.03;
     back_sphere.enable_shadow = 1.0;
     back_image.src = "back.jpg";
     all_obj.push(back_sphere);
 
-    
 
     let sun_sphere = new obj_buffer_tex(program);
     var sun_image = new Image();
@@ -333,13 +348,14 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         sun_sphere.TEXture( sun_image );
     }
     sun_sphere.the_buffer(sun,program);
+
     sun_sphere.speed = 0.5;
     //sun_sphere.enable_light = 1.0;
     sun_sphere.enable_shadow = 1.0;
     sun_image.src = "8k_sun.jpg";
     all_obj.push(sun_sphere);
 
-    
+
     	
     
 
@@ -482,10 +498,12 @@ function render(program) {
 
     for(let i = 0;i < obj_count;i++)
     {
+
         modeling = mult(rotate(all_obj[i].theta[xAxis], 1, 0, 0),
                     mult(rotate(all_obj[i].theta[yAxis], 0, 1, 0),rotate(all_obj[i].theta[zAxis], 0, 0, 1)));
         if (! paused) all_obj[i].theta[axis] += all_obj[i].speed;
         //theta = all_obj[i].theta;
+
 
         enable_light = all_obj[i].enable_light;
         enable_shadow = all_obj[i].enable_shadow;
@@ -494,9 +512,7 @@ function render(program) {
         gl.uniformMatrix4fv( projectionLoc, 0, flatten(projection) );
         gl.uniform1f( des_light_loc, enable_light);
         gl.uniform1f( des_shadow_loc, enable_shadow);
-        
-		
-		
+
 		if(i==obj_count-1)
 		{
 			//gl.disable(gl.DEPTH_TEST);
@@ -529,6 +545,7 @@ function render(program) {
     gl.enable(gl.DEPTH_TEST);
     gl.depthMask(true);
 */
+
 
     requestAnimFrame( render );
 }
