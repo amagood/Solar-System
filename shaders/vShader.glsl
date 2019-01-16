@@ -6,26 +6,27 @@ attribute vec4 vNormal;
 attribute vec2 vTexCoord;
 
 varying vec4 fPosition;
+varying vec4 fPosition_weed;
 varying vec4 fColor;
-varying vec2 fTexCoord;
 varying vec4 fNormal;
+varying vec2 fTexCoord;
 
 uniform mat4 modelingMatrix;
 uniform mat4 viewingMatrix;
 uniform mat4 projectionMatrix;
-
-
-
-//uniform float rt_w; // GeeXLab built-in
-//uniform float rt_h; // GeeXLab built-in
+uniform float colorch;
 
 void main()
 {
-    vec4 N = normalize( modelingMatrix * vNormal );	// Normal vector
-
-	fPosition = modelingMatrix * vPosition;
+    vec4 N = normalize( modelingMatrix * vNormal ); // Normal vector
+    //vec4 vColor = vec4(cos(colorch),sin(colorch),1.0-cos(colorch),1.0);
+    fPosition = modelingMatrix * vPosition;
+    fPosition_weed = vPosition;
     fColor = vColor;
-	fNormal = N;
-	fTexCoord = vTexCoord;
-    gl_Position = projectionMatrix * viewingMatrix * modelingMatrix * vPosition;
+    fNormal = N;
+    fTexCoord = vTexCoord;
+    vec4 just_weed = projectionMatrix * viewingMatrix * modelingMatrix * vPosition;
+    //just_weed.x += sin((vPosition.y+1.0)*3.14*10.0);
+    //just_weed.y += 0.05*sin((vPosition.y+1.0)*3.14*10.0);//explode
+    gl_Position = just_weed;
 }
