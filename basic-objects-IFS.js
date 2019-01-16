@@ -162,6 +162,7 @@ function obj_sphere(radius, pos_x, pos_y, pos_z ,alpha ,degree)
   this.colorsArray = [];
   this.normalsArray = [];
   this.texcoords = [];
+  this.pos_loc = [pos_x,pos_y,pos_z];
 
   let tex_index = 0;//test_for_texcord
   this.spherePoint = function (theta, phi) {
@@ -224,6 +225,7 @@ function obj_ring(inner_radius,outer_radius, pos_x, pos_y, pos_z ,alpha ,degree)
   this.colorsArray = [];
   this.normalsArray = [];
   this.texcoords = [];
+  this.pos_loc = [pos_x,pos_y,pos_z];
   this.spherePoint = function (theta, radius) {
     var V = vec4(radius*Math.cos(theta)+pos_x, 0+pos_y, radius*Math.sin(theta)+pos_z, 1.0);//計算座標
     var smallV = scalev(radius, V); // scale the sphere to the range of [-0.5, 0.5]

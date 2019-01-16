@@ -7,7 +7,12 @@ class obj_buffer_tex
     this.VertexTextureCoordinate_Buffer = null;
     this.len = 0;
     this.theta = [ 0, 0, 0 ];
+    this.Axis = 1;
     this.speed = 0.2;
+    this.self_theta = [ 0, 0, 0 ];
+    this.self_Axis = 1;
+    this.self_speed = -2.0;
+    this.location = [0,0,0];
     //this.IndicesBuffer = null;
     //this.IndicesLen = 0;
     this.Texture_Buffer = null;
@@ -22,6 +27,7 @@ class obj_buffer_tex
     this.modelingmatrix = null;
     this.enable_light = 0.0;//0->normal 1->not normal
     this.enable_shadow = 0.0;//0->have shadow 1->dont have shadow
+    this.enable_self_go_around = 0.0;
     //this.tex_loc = gl.getUniformLocation(program, "texture")
     //this.image = new Image();
   }
@@ -31,6 +37,9 @@ class obj_buffer_tex
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VertexPosition_Buffer);
     gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.pointsArray), gl.STATIC_DRAW);
     this.len = obj.numVertices;
+    this.loction[0] = obj.pos_loc[0];
+    this.loction[1] = obj.pos_loc[1];
+    this.loction[2] = obj.pos_loc[2];
 
     var vPosition = gl.getAttribLocation( program, "vPosition" );
     gl.vertexAttribPointer( vPosition, 4, gl.FLOAT, false, 0, 0 );
@@ -83,6 +92,9 @@ class obj_buffer_tex
     gl.bufferData(gl.ARRAY_BUFFER, flatten(obj.pointsArray), gl.STATIC_DRAW);
     // color array atrribute buffer
     this.len = obj.numVertices;
+    this.location[0] = obj.pos_loc[0];
+    this.location[1] = obj.pos_loc[1];
+    this.location[2] = obj.pos_loc[2];
     
     this.VertexColor_Buffer = gl.createBuffer();
     gl.bindBuffer(gl.ARRAY_BUFFER, this.VertexColor_Buffer);

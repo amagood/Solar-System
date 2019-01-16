@@ -9,7 +9,6 @@ var theta = [ 0, 0, 0 ];
 var paused = 0;
 var depthTest = 1;
 
-
 var obj_count = 14;
 
 var all_obj = [];
@@ -56,8 +55,7 @@ function handleMouseUp(event) {
 
 var mouseSensitiveXEle;
 var mouseSensitiveYEle;
-var FOVcfg;
-var transp;
+
 
 var mouseMove = [0, 0];
 function handleCanvasMouseMove(event) {
@@ -134,7 +132,6 @@ var lightPosition = vec4( 0.0, 2.0, 0.0, 1.0 );
 var materialAmbient = vec4( 0.05, 0.05, 0.05, 1.0 );
 var materialDiffuse = vec4( 0.8, 0.8, 0.8, 1.0);
 var materialSpecular = vec4( 0.8, 0.8,0.8, 0.8 );
-
 var materialShininess = 50.0;
 
 
@@ -155,7 +152,6 @@ function configureTexture( image , program) {
 
 var AU = 2;
 var draw_time = 10.0;
-
 
 var sun = new obj_sphere(4.0/10,0*AU,0,0,0.5,5);
 var sun_in = new obj_sphere(3.99/10,0*AU,0,0,0.5,5);
@@ -195,17 +191,6 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
 
     
 
-	let test_ring_tex = new obj_buffer_tex(program);
-    var ring_image = new Image();
-    ring_image.onload = function() { 
-        test_ring_tex.TEXture( ring_image );
-    }
-    test_ring_tex.the_buffer(test_ring,program);
-    test_ring_tex.speed = -0.8;
-    test_ring_tex.enable_light = 1.0;
-    ring_image.src = "ring.jpg";
-    all_obj.push(test_ring_tex);
-
     let sun_in_sphere = new obj_buffer_tex(program);
     var sun_in_image = new Image();
     sun_in_image.onload = function() { 
@@ -213,12 +198,12 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     }
     sun_in_sphere.the_buffer(sun_in,program);
     sun_in_sphere.speed = -0.1;
+    sun_in_sphere.Axis = 2;
     //sun_sphere.enable_light = 1.0;
     sun_in_sphere.enable_shadow = 1.0;
     sun_in_image.src = "8k_sun.jpg";
     all_obj.push(sun_in_sphere);
     
-
     let mec_sphere = new obj_buffer_tex(program);
     var mec_image = new Image();
     mec_image.onload = function() { 
@@ -245,9 +230,8 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         ear_sphere.TEXture( ear_image );
     }
     ear_sphere.the_buffer(ear,program);
-
-    ear_sphere.speed = 0.8;
-
+    ear_sphere.speed = 0.3;
+    ear_sphere.self_Axis = 1;
     ear_image.src = "earth.jpg";
     all_obj.push(ear_sphere);
 
@@ -257,9 +241,8 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         moo_sphere.TEXture( moo_image );
     }
     moo_sphere.the_buffer(moo,program);
-
-    moo_sphere.speed = 0.8;
-
+    moo_sphere.speed = 0.3;
+    moo_sphere.location[2] = 0.0;
     moo_image.src = "moon.jpg";
     all_obj.push(moo_sphere);
 
@@ -299,9 +282,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         ura_sphere.TEXture( ura_image );
     }
     ura_sphere.the_buffer(ura,program);
-
     ura_sphere.speed = 0.1;
-
     ura_image.src = "ura.jpg";
     all_obj.push(ura_sphere);
 
@@ -311,9 +292,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         net_sphere.TEXture( net_image );
     }
     net_sphere.the_buffer(net,program);
-
     net_sphere.speed = -0.05;
-
     net_image.src = "nep.jpg";
     all_obj.push(net_sphere);
 
@@ -323,9 +302,7 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         bor_sphere.TEXture( bor_image );
     }
     bor_sphere.the_buffer(bor,program);
-
     bor_sphere.speed = -0.3;
-
     bor_image.src = "bor.jpg";
     all_obj.push(bor_sphere);
 
@@ -335,12 +312,22 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         back_sphere.TEXture( back_image );
     }
     back_sphere.the_buffer(back,program);
-
+    back_sphere.enable_self_go_around = 1.0;
     back_sphere.speed = 0.03;
     back_sphere.enable_shadow = 1.0;
     back_image.src = "back.jpg";
     all_obj.push(back_sphere);
 
+    let test_ring_tex = new obj_buffer_tex(program);
+    var ring_image = new Image();
+    ring_image.onload = function() { 
+        test_ring_tex.TEXture( ring_image );
+    }
+    test_ring_tex.the_buffer(test_ring,program);
+    test_ring_tex.speed = -0.8;
+    test_ring_tex.enable_light = 1.0;
+    ring_image.src = "ring.jpg";
+    all_obj.push(test_ring_tex);
 
     let sun_sphere = new obj_buffer_tex(program);
     var sun_image = new Image();
@@ -348,14 +335,14 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
         sun_sphere.TEXture( sun_image );
     }
     sun_sphere.the_buffer(sun,program);
-
-    sun_sphere.speed = 0.5;
+    sun_sphere.speed = 0.3;
+    sun_sphere.self_speed = 0.0;
     //sun_sphere.enable_light = 1.0;
     sun_sphere.enable_shadow = 1.0;
     sun_image.src = "8k_sun.jpg";
     all_obj.push(sun_sphere);
 
-
+    
     	
     
 
@@ -383,10 +370,6 @@ var test_ring = new obj_ring(0.25,0.15,3.2*AU,0,0,1.0,0.01);
     document.getElementById( "pButton" ).onclick = function() {paused=!paused;};
 	mouseSensitiveXEle=document.getElementById("x_sensitivity");
 	mouseSensitiveYEle=document.getElementById("y_sensitivity");
-	FOVcfg=document.getElementById("FOVcfg");
-	//transp=document.getElementById("transp");
-	FOVcfg.value=60;
-	//transp.value=2;
 	// event handlers for mouse input (borrowed from "Learning WebGL" lesson 11)
 	canvas.onmousedown = handleMouseDown;
     document.onmouseup = handleMouseUp;
@@ -491,28 +474,34 @@ function render(program) {
 	
 	viewing = lookAt(vec3(eyePosition), lookPos, upPos);//eyePosition  lookPos upPos
 
-	projection = perspective(FOVcfg.value, canvas.width/canvas.height, 0.1, 1000.0);  /// (FOV, proportion, nearest(smaller is better),farest(larger is better))
+	projection = perspective(60, canvas.width/canvas.height, 0.1, 1000.0);  /// (FOV, proportion, nearest(smaller is better),farest(larger is better))
 
     gl.clear( gl.COLOR_BUFFER_BIT | gl.DEPTH_BUFFER_BIT );
 	//if (depthTest) gl.enable(gl.DEPTH_TEST); else gl.disable(gl.DEPTH_TEST);
 
     for(let i = 0;i < obj_count;i++)
     {
-
+        let self_modeling = mult(rotate(all_obj[i].self_theta[xAxis], 1, 0, 0),
+                    mult(rotate(all_obj[i].self_theta[yAxis], 0, 1, 0),rotate(all_obj[i].self_theta[zAxis], 0, 0, 1)));
+        all_obj[i].self_theta[all_obj[i].self_Axis] += all_obj[i].self_speed;
+        let self_modeling_final = mult(mult(translate(all_obj[i].location[0], all_obj[i].location[1], all_obj[i].location[2]),self_modeling),translate(-1*all_obj[i].location[0], -1*all_obj[i].location[1], -1*all_obj[i].location[2]));
         modeling = mult(rotate(all_obj[i].theta[xAxis], 1, 0, 0),
                     mult(rotate(all_obj[i].theta[yAxis], 0, 1, 0),rotate(all_obj[i].theta[zAxis], 0, 0, 1)));
-        if (! paused) all_obj[i].theta[axis] += all_obj[i].speed;
+        if (! paused) all_obj[i].theta[all_obj[i].Axis] += all_obj[i].speed;
+        if(all_obj[i].enable_self_go_around > 0.0)modeling_final = modeling;
+        else modeling_final = mult(modeling,self_modeling_final);
         //theta = all_obj[i].theta;
-
 
         enable_light = all_obj[i].enable_light;
         enable_shadow = all_obj[i].enable_shadow;
-        gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling) );
+        gl.uniformMatrix4fv( modelingLoc,   0, flatten(modeling_final) );
         gl.uniformMatrix4fv( viewingLoc,    0, flatten(viewing) );
         gl.uniformMatrix4fv( projectionLoc, 0, flatten(projection) );
         gl.uniform1f( des_light_loc, enable_light);
         gl.uniform1f( des_shadow_loc, enable_shadow);
-
+        
+		
+		
 		if(i==obj_count-1)
 		{
 			//gl.disable(gl.DEPTH_TEST);
@@ -545,7 +534,6 @@ function render(program) {
     gl.enable(gl.DEPTH_TEST);
     gl.depthMask(true);
 */
-
 
     requestAnimFrame( render );
 }
